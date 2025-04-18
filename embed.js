@@ -3,7 +3,7 @@
   container.id = 'chatbot-container';
   document.body.appendChild(container);
 
-  const html = await fetch('https://wali-dt.github.io/chatbot/index.html').then(res => res.text());
+  const html = await fetch('https://wali-dt.github.io/chatbot/widget.html').then(res => res.text());
   const style = await fetch('https://wali-dt.github.io/chatbot/style.css').then(res => res.text());
   const script = await fetch('https://wali-dt.github.io/chatbot/script.js').then(res => res.text());
 
