@@ -1,9 +1,3 @@
-const chatBox = document.getElementById("chatBox");
-
-function toggleChat() {
-  chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
-}
-
 async function sendMessage() {
   const input = document.getElementById("messageInput");
   const text = input.value.trim();
@@ -20,32 +14,24 @@ async function sendMessage() {
   chatMessages.appendChild(typingIndicator);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
+  try {
+    const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text })
+    });
 
-  const data = await res.json();
-  typingIndicator.remove();
-  const formattedReply = marked.parse(data.reply);
-  chatMessages.innerHTML += `<div class="message bot">${formattedReply}</div>`;
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+    const data = await res.json();
 
-const messageInput = document.getElementById("messageInput");
+    if (!data.reply) throw new Error("No reply found in response");
 
-messageInput.addEventListener("keydown", function (e) {
-  // Reset height to shrink when content is deleted
-  this.style.height = "auto";
-
-  // Expand up to max-height (200px)
-  const maxHeight = 200;
-  const newHeight = Math.min(this.scrollHeight, maxHeight);
-  this.style.height = `${newHeight}px`;
-
-  if (e.key === "Enter" && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
+    typingIndicator.remove();
+    const formattedReply = marked.parse(data.reply);
+    chatMessages.innerHTML += `<div class="message bot">${formattedReply}</div>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } catch (error) {
+    typingIndicator.remove();
+    chatMessages.innerHTML += `<div class="message bot">⚠️ Error: ${error.message}</div>`;
+    console.error("Error in sendMessage:", error);
   }
-});
+}
