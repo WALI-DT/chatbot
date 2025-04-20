@@ -1,48 +1,62 @@
 const chatBox = document.getElementById("chatBox");
+const messageInput = document.getElementById("messageInput");
 
 function toggleChat() {
   chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
 }
 
 async function sendMessage() {
-  const input = document.getElementById("messageInput");
+  const input = messageInput;
   const text = input.value.trim();
   if (!text) return;
 
   const chatMessages = document.getElementById("chatMessages");
-  chatMessages.innerHTML += <div class="message user">${text}</div>;
+
+  // Show user message
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user";
+  userMessage.textContent = text;
+  chatMessages.appendChild(userMessage);
   input.value = "";
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
+  // Typing indicator
   const typingIndicator = document.createElement("div");
   typingIndicator.className = "message bot typing";
-  typingIndicator.innerHTML = <span class="dot"></span><span class="dot"></span><span class="dot"></span>;
+  typingIndicator.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
   chatMessages.appendChild(typingIndicator);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
-  const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ message: text })
-  });
+  try {
+    const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: text }),
+    });
 
-  const data = await res.json();
-  typingIndicator.remove();
-  const formattedReply = marked.parse(data.reply);
-  chatMessages.innerHTML += <div class="message bot">${formattedReply}</div>;
+    const data = await res.json();
+    typingIndicator.remove();
+
+    const botMessage = document.createElement("div");
+    botMessage.className = "message bot";
+    botMessage.innerHTML = marked.parse(data.reply || "No response.");
+    chatMessages.appendChild(botMessage);
+  } catch (err) {
+    typingIndicator.remove();
+
+    const errorMsg = document.createElement("div");
+    errorMsg.className = "message bot";
+    errorMsg.textContent = "⚠️ There was an error connecting to the server.";
+    chatMessages.appendChild(errorMsg);
+  }
+
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-const messageInput = document.getElementById("messageInput");
-
+// Input behavior: auto-height & Enter key submit
 messageInput.addEventListener("keydown", function (e) {
-  // Reset height to shrink when content is deleted
   this.style.height = "auto";
-
-  // Expand up to max-height (200px)
-  const maxHeight = 200;
-  const newHeight = Math.min(this.scrollHeight, maxHeight);
-  this.style.height = ${newHeight}px;
+  this.style.height = Math.min(this.scrollHeight, 200) + "px";
 
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
