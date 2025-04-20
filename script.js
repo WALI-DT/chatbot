@@ -28,7 +28,7 @@ async function sendMessage() {
   chatMessages.scrollTop = chatMessages.scrollHeight;
 
   try {
-    const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
+    const res = await fetch("https://abdul-wali.app.n8n.cloud/webhook-test/c0423075-9067-4e31-b2a1-c32c0e4a3ac8", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ message: text }),
