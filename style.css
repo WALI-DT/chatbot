@@ -20,9 +20,10 @@ body {
   height: 55px;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  background-color: black; /* <- ADD THIS */
-  padding: 6px; /* optional to create space between image and black bg */
+  background-color: black;
+  padding: 6px;
 }
+
 
 
 .chat-widget-label {
